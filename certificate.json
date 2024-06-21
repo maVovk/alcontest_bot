@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "alconcontest",
+  "private_key_id": "43f44ed5f5bf19563343657a377cc8938fb74e57",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC/24Y8hvO2i+vK\nMG0AWN/QoFPNx2/gagI510oSXhMHz1tqYmrNly6avzSDsnjWBGStN4QMKNxze/eF\nDbTHsC42O8ihFhgw5zrvK0osCCc4hLvXl4/c0+Ta0lkMphk94tJzrg6adPU+wneJ\nQZLurS0NW7tVHbtQgifE5PQ0sJ+PGRERxnGTL99LS2hVTkvqcbX3fV6L+U9dh8KF\nA2ierQZyb6THJl0kehB7w9g9kx+hdpnhvsyffxs0DhOxMJuZtvDAu/njLqbBupZ0\nMqbh7CkJgxvz5jvfbXB2pgvgoDXHFEIn3mRG5sITsRv6Grfuf6rZHaV0NQCa4kIR\nkMz8bkF7AgMBAAECggEANn5NQerY1Twn1E1t4F/d7l1jgDrJ6ZVinXgrV002HY1F\ne1GJ4Wwz9gsiCNgL30nvKI3wqR2ABCMtWjLa6q79aTUQ1sQ2ScmboSwMDLaiITj+\nO42WdJQQ2CBP37pbyAqhWO8Swcc/kzxcBHXGHJm+hqFL87CWsBbP4epf/IlAQL3R\nh+bdPfNdCqJECenC/U9N8q/0fpNmXHrgazN8ngyrWtz9vvwWmMBzHahn4/0bUujg\nCf4BmgOY3xgM+Rpb2p3P6wOmb1/6OIf8Ig/oe6VkfBUaaxpJzsmH1AbWL/W0T2pM\nkmjHixgl7ffXs44p6oLsfcojcG0cvXFehLXZguy1XQKBgQDfCSJuaTg4IvliPf+a\n9UYD7t8bUlPvNZ3WA5hMsXVOKMfcnAOAlXywoSun1zgQwPZNiE7CYuwWl5NqPl29\nScf/EC/KzOBwfHle0oHgNr8CMH6y97IW13rOfbBY8sKbdijZt+0I6Ke77Fn4mWJT\nB+v0RKZWebKsT0+VP87Y3oOCVQKBgQDcNrh5dCCi3BzDllnTTduhZJrH2V8dI/vt\ndBKbIAJm4ookrvHMMCoCvVeXhOhLU6noZXwCrB6vceUZpB9lYMc2Rt7qA4U/woE7\n5PDV6a1k4TSs3aKra+znMi68Q1/puP+m8oimttMnfRk94zjBa3G5K12w4FuLWLnW\nI2jKqZKkjwKBgD3I/wPNHCjY73Lar/NSXPn780xTSzMqDDZcOpWMV222eF9RzNqT\nDr6zdy+AvGRPwCuMRh0tYC+F/+1fp4InbULoTgUFKmue39R3xkjBgbpuirqzSV9w\ng/Gt+es6HNUKL5jYjc54/PZfLDFk9EsCF8hMODQedHOtaON0kK2dPpsdAoGAbMgD\nPMvmy0ycUOnWmZEea419ADgayhRagKQUBNk9FoHV5+UbwNgSCKRrvoeDEKLVjd2D\n8vX/en9ywsXWVIgIIIHF4Ce5DRQSLvobFjCG3Qx6ruIVV0TLFDIv8AQAPz6J23h3\nlJM/n4QmkfHKuZFP7j7D23oY/q7nriZzv5kgvXUCgYEAiIHSmwxeJP/D43G7Nmpm\nZK7Eb9BpqwBbXeJYzO8G2OANcQbp5iMFiA+wGrVy/pZOqBEA8eehPECkc7FAia9w\nHMyyMDaKOdK30aXsEmy5p2qQzzXP2i/gAqqpfMueoZomzZiszI42E0ZS33/9Beko\nqXqSxzrTmHyjwHtcyKPsbBQ=\n-----END PRIVATE KEY-----\n",
+  "client_email": "coftochkaaaa@alconcontest.iam.gserviceaccount.com",
+  "client_id": "112571254465390841599",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/coftochkaaaa%40alconcontest.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
