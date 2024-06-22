@@ -76,11 +76,15 @@ class Contest:
             self.table[name] = Row(name, data[:-2], data[-2], data[-1], self.task_names)
                 
     def __load_table(self):
-        for page in range(1,6):
-            rq = requests.get(self.table_link + f"?p={page}")
-            if (rq.status_code != 200):
-                raise ConnectionRefusedError ("Cant reach conteset")
-            self.__parse_table(rq.text)
+        try:
+            for page in range(1,6):
+                rq = requests.get(self.table_link + f"?p={page}")
+                if (rq.status_code != 200):
+                    raise ConnectionRefusedError ("Cant reach conteset")
+                self.__parse_table(rq.text)
+        except Exception as e:
+            print(e)
+            print("Error while loading table, please check connection to internet.")
 
     def get_table(self) -> dict:
         self.tm_mutex.acquire()
