@@ -33,6 +33,8 @@ except Exception as e:
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.FileHandler('bot.log', 'w', 'utf-8')
+handler.setFormatter("%(asctime)s;%(levelname)s;%(message)s",
+                              "%Y-%m-%d %H:%M:%S")
 logger.addHandler(handler)
 
 logger.info(f'Инициализируем БД c настройками: {settings}')
@@ -41,7 +43,7 @@ db.update()
 db.save()
 db.save_table_to_csv()
 load_to_sheets(csv_data="table_budget.csv")
-
+logger.info('Инициализация БД закончена')
 
 async def identify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = "Пожалуйста, введите токен команды:"
@@ -92,10 +94,12 @@ async def random_msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         team = db.team_of(tg_id)
         if db.team_obj_by_name(team).make_bet(bet, chosen_task):
             db.bet_has_been_approved(tg_id)
+
             logger.info(f"{db.team_of(tg_id)} поставила {bet} на решение задачи {chosen_task}")
 
             await update.message.reply_text(f"Ваша команда успешно поставила {bet} баллов на решение задачи {chosen_task} с первого раза")
         else:
+            logger.info(f"У {db.team_of(tg_id)} не хватило на {bet}, задача {chosen_task}")
             await update.message.reply_text("Нужно больше золота.")
         return None        
 
@@ -133,6 +137,8 @@ async def naperstki(tg_id, query):
         await query.edit_message_text("Нужно больше золота.")
         return 
     
+
+    logger.info(f'{db.team_obj_by_name(team_name)} играет в напёрстки')
     db.team_obj_by_name(team_name).add_money(-10)
     keyboard_ = [[InlineKeyboardButton("ТЫК", callback_data="nap="+str(i)) for i in range(3)]]
     reply_markup = InlineKeyboardMarkup(keyboard_)
@@ -148,6 +154,8 @@ async def casino(tg_id, query):
         return 
     
     res = int(round(random.random()**1.25 * 20))
+
+    logger.info(f'{db.team_obj_by_name(team_name)} играет в казино в выбивает {res}')
 
     db.team_obj_by_name(team_name).add_money(res - 10)
     if (res < 10):
@@ -219,6 +227,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             team = db.team_of(tg_id)
             db.team_obj_by_name(team).add_money(money_prize)
             res += f"Мда, я проиграл... Держи {money_prize} Баллов." 
+            logger.info(f'{db.team_obj_by_name(team)} выигрывает {money_prize} в напёрстках')
         else:
             res += "Программируешь, ты, конечно, лучше... Иди займись чем-нибудь полезным и возварщайся с новыми быллами."
         await query.edit_message_text(res)
