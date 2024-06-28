@@ -33,8 +33,7 @@ except Exception as e:
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.FileHandler('bot.log', 'w', 'utf-8')
-handler.setFormatter("%(asctime)s;%(levelname)s;%(message)s",
-                              "%Y-%m-%d %H:%M:%S")
+handler.setFormatter(logging.Formatter("%(asctime)s: %(message)s", "%H:%M:%S"))
 logger.addHandler(handler)
 
 logger.info(f'Инициализируем БД c настройками: {settings}')
@@ -54,20 +53,7 @@ async def identify(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
         
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    text = \
-'''*Добро пожаловать на лучшее мероприятие этого лета!*
-У вас есть несколько способов делать ставки:
-
-*Рулетка:*
-Фиксированная ставка в 10 баллов, вам может выпасть как больше, так и меньше. 
-        
-*Ставка на задачу:*
-Вы ставите выбранное количество баллов на одну из задач, по которой еще не было попыток. Если вы ее сдаете с первого раза, вы получаете свои баллы назад в удвоенном размере. 
-
-*Игра в три наперстка:*
-Мы загадываем кладем подарок под одну из кнопок. Если вы угадываете, под какую, вы его получаете. Попытка так же стоит 10 баллов. 
-
-_В любой непонятной ситуации пишите /menu ))_'''
+    text = 'ABOBA'
     await update.message.reply_text(text, parse_mode="Markdown")  
 
 async def random_msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
