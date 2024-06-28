@@ -57,23 +57,25 @@ class Contest:
             tasks.append(task)
         self.task_names = tasks   
         
-        body = bs.find_all("tbody")        
+        body = bs.find_all("tbody")
         bd = BeautifulSoup(str(body[0]), "html.parser")
         lines = bd.find_all("tr")
 
         for parti in lines:
-            rank = parti.find('td')['title']
-            name = parti.find("div")['title'].strip('"')
+            rank = parti.find('td')['title'].strip()
+            name = parti.find("div")['title'].strip('"').split('(')[0].strip()
+            
             data = []
             for task in parti.find_all("td")[2:]:
                 task_state = task.find('div')
+            
                 if (task_state):
                     string = str(task.find('div'))
                     string = string[:-6].split('>')[-1]
                     data.append(string.replace('—', '-'))
                 else:
                     data.append(task['title'])
-            self.table[name] = Row(name, data[:-2], data[-2], data[-1], self.task_names)
+            self.table[name] = Row(name.strip(), data[:-2], data[-2], data[-1], self.task_names)
                 
     def __load_table(self):
         try:

@@ -1,9 +1,10 @@
+import json
 from threading import Lock as Mutex
 from contest_import import Contest, Row
 import time
 from sheets import load_to_sheets
 
-TASK_COST = 100
+TASK_COST = 1000
 
 class Bet:
     def __init__(self, money, task):
@@ -45,7 +46,7 @@ class Team:
             return True
 
     def get_budget(self):
-        return self.budget
+        return int(self.budget)
     
     def get_unsolveed_tasks(self):
         ans = []
@@ -79,7 +80,7 @@ class Team:
         self.line = line
 
 class DataBase: 
-    def __init__(self, team_by_id_file, contest_id):
+    def __init__(self, team_by_id_file, team_by_token_file, contest_id):
         self.contest = Contest(contest_id)
     
         self._registrated_users = {}
@@ -89,6 +90,7 @@ class DataBase:
         self.mutex_on_reg = Mutex()
 
         self._team_by_id = {}
+        self._team_by_token = {}
         self.mutex_team = Mutex()
 
         self.teams = []
@@ -98,10 +100,13 @@ class DataBase:
 
         self._registrating_task = {}
         self.mutex_reg_task = Mutex()
+
         try: 
-            with open(team_by_id_file, 'r') as file:
-                dct = file.read()
-                exec(f"self._team_by_id = {dct}")
+            with open(team_by_id_file, 'r', encoding='utf-8') as file:
+                self._team_by_id = json.loads(file.read())
+
+            with open(team_by_token_file, 'r', encoding='utf-8') as file:
+                self._team_by_token = json.loads(file.read())
 
             for reg_code, team_name in self._team_by_id.items():
                 self.teams.append(team_name)
@@ -121,7 +126,7 @@ class DataBase:
         res = None
         if tg_id in self._registrating_task.keys():
             res = self._registrating_task[tg_id]
-        self.mutex_reg_task.release();
+        self.mutex_reg_task.release()
         return res
 
     def bet_has_been_approved(self, tg_id : str) -> None:
@@ -167,12 +172,12 @@ class DataBase:
         
     def registrate(self, tg_id : str, team_tag : str) -> bool:
         self.mutex_team.acquire()
-        if not (team_tag in self._team_by_id.keys()):
+        if not (team_tag in self._team_by_token.keys()):
             self.mutex_team.release()
             return False
         
         self.mutex_reg_users.acquire()
-        self._registrated_users[tg_id] = self._team_by_id[team_tag]
+        self._registrated_users[tg_id] = self._team_by_token[team_tag]
         self.mutex_team.release()
         self.mutex_reg_users.release()
 
@@ -182,8 +187,8 @@ class DataBase:
         return True
 
     def team_of(self, tg_id : str) -> str:
-        self.mutex_team.acquire();
-        res = self._registrated_users[tg_id];
+        self.mutex_team.acquire()
+        res = self._team_by_id[self._registrated_users[tg_id]]
         self.mutex_team.release()
         return res
 
@@ -194,7 +199,7 @@ class DataBase:
         return res
     
     def save(self, path = "database.save"):
-        with open(path, 'w') as file:
+        with open(path, 'w', encoding='utf-8') as file:
             #file.write(str(self._team_obj_by_name)+'\n')
             ans = []
             for name, obj in self._team_obj_by_name.items():
@@ -211,7 +216,7 @@ class DataBase:
             file.write(str(self._on_registration)+'\n')
 
     def load(self, path = "database.save"):
-        with open(path, 'r') as file:
+        with open(path, 'r', encoding='utf-8') as file:
             dicts = file.read().split("SEPARATOR\n")
             exec(f"self._team_obj_by_name = {dicts[0]}")
             exec(f"self._registrated_users = {dicts[1]}")
@@ -241,5 +246,3 @@ class DataBase:
             load_to_sheets(csv_data = "standings_with_budget.csv")
             self.save("bot_DB_state.save")
             time.sleep(10)
-            
-            

@@ -1,0 +1,6 @@
+__pycache__/
+venv/
+*.save
+*.log
+*.csv
+certificate.json

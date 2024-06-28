@@ -6,6 +6,8 @@ import time
 import threading
 import random
 from sheets import load_to_sheets
+import json
+import logging
 
 threads = []
 
@@ -21,14 +23,20 @@ def sliced(arr=[], cols=1):
 settings = {}
 
 try:
-    with open("settings.set", "r") as file:
-        text= file.read()
-        exec(f"settings = {text}")
-
+    with open("settings.json", "r", encoding='utf-8') as file:
+        settings = json.loads(file.read())
+        print(settings)
 except Exception as e:
-    print(e, "ASDASDASDASD")
+    print(e, "Проблема при чтении настроек")
 
-db = DataBase(settings["REGISTRATED_TEAMS_FILE"], settings["CONTEST_ID"])
+# logging.basicConfig(filename='bot.log', level=logging.INFO)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.FileHandler('bot.log', 'w', 'utf-8')
+logger.addHandler(handler)
+
+logger.info(f'Инициализируем БД c настройками: {settings}')
+db = DataBase(settings["REGISTRATED_TEAMS_FILE"], settings["TEAM_TOKENS_FILE"], settings["CONTEST_ID"])
 db.update()
 db.save()
 db.save_table_to_csv()
@@ -36,9 +44,10 @@ load_to_sheets(csv_data="table_budget.csv")
 
 
 async def identify(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = "Пожалуйста, укажите номер команды, чтобы мы знали, от чьего лица вы делаете ставки."
+    text = "Пожалуйста, введите токен команды:"
     tg_id = context._user_id
     db.add_in_reg_queue(tg_id)
+    logger.info(f'Регается {tg_id}')
     await update.message.reply_text(text)
     
         
@@ -66,7 +75,8 @@ async def random_msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
     if (db.in_registration_queue(tg_id)):
         if db.registrate(tg_id, msg):
-            text = f"Регистрация прошла успешно! Вы теперь участник команды: {db.team_of(tg_id)} !!!\n"
+            text = f"Регистрация прошла успешно! Вы теперь участник команды: {db.team_of(tg_id)}!!!\n"
+            logger.info(f'{tg_id} зарегалася в тиму {db.team_of(tg_id)}')
         else:
             text = "Неверный код команды. Попробуй еще или попроси помощи более трезвого товарища."
         await update.message.reply_text(text) 
@@ -82,12 +92,14 @@ async def random_msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         team = db.team_of(tg_id)
         if db.team_obj_by_name(team).make_bet(bet, chosen_task):
             db.bet_has_been_approved(tg_id)
+            logger.info(f"{db.team_of(tg_id)} поставила {bet} на решение задачи {chosen_task}")
+
             await update.message.reply_text(f"Ваша команда успешно поставила {bet} баллов на решение задачи {chosen_task} с первого раза")
         else:
             await update.message.reply_text("Нужно больше золота.")
         return None        
 
-    text = "Ты думал тут что-то будет?"
+    text = "Лучше нажми /menu"
     await update.message.reply_text(text) 
     return None
 
@@ -116,6 +128,7 @@ async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def naperstki(tg_id, query):
     team_name = db.team_of(tg_id)
     budget = db.team_obj_by_name(team_name).get_budget()
+
     if (budget < 10):
         await query.edit_message_text("Нужно больше золота.")
         return 
@@ -123,6 +136,7 @@ async def naperstki(tg_id, query):
     db.team_obj_by_name(team_name).add_money(-10)
     keyboard_ = [[InlineKeyboardButton("ТЫК", callback_data="nap="+str(i)) for i in range(3)]]
     reply_markup = InlineKeyboardMarkup(keyboard_)
+
     await query.edit_message_text("Вжух-вжух-вжух\nДа начнется игра!", reply_markup=reply_markup)
     pass 
 
@@ -133,11 +147,11 @@ async def casino(tg_id, query):
         await query.edit_message_text("Нужно больше золота.")
         return 
     
-    res = round(random.random()**1.25 * 20)
+    res = int(round(random.random()**1.25 * 20))
 
     db.team_obj_by_name(team_name).add_money(res - 10)
     if (res < 10):
-        res = '0' + str(res)
+        res = ' ' + str(res)
     else:
         res = str(res)
     await query.edit_message_text(f"Вы выбили ||{res}|| баллов", parse_mode="MarkdownV2")

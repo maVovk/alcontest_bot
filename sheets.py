@@ -22,7 +22,6 @@ def load_to_sheets(table_name = 'Результаты_с_учетом_балло
         creds = ServiceAccountCredentials.from_json_keyfile_name('certificate.json', scope)
         client = gspread.authorize(creds)
 
-
         # Выбор Google Таблицы для загрузки данных
         sheet = client.open(table_name).sheet1
 
