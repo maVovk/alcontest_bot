@@ -1,6 +1,5 @@
 {
     "BOT_TOKEN" : "",
     "CONTEST_ID" : "",
-    "REGISTRATED_TEAMS_FILE" : "reg.json",
-    "TEAM_TOKENS_FILE" : "registration_tokens.json"
+    "REGISTRATED_TEAMS_FILE" : "reg.json"
 } 

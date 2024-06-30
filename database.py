@@ -25,7 +25,16 @@ class Team:
         self.line = line
 
     def __str__(self):
-        return f"Team(\"{self.name}\", {self.budget}, {str(self.bets)}, {str(self.line)})"
+        res = ""
+        if (len(self.bets) == 0):
+            res = "set()"
+        else:
+            res = []
+            for bet in self.bets:
+                res.append(str(bet))
+            res = "{" + ", ".join(bet) + "}"
+
+        return f"Team(\"{self.name}\", {self.budget}, {res}, {str(self.line)})"
 
     def add_money(self, add):
         self.budget += add
@@ -80,7 +89,16 @@ class Team:
         self.line = line
 
 class DataBase: 
-    def __init__(self, team_by_id_file, team_by_token_file, contest_id):
+    def load(self, path = "database.save"):
+        with open(path, 'r', encoding='utf-8') as file:
+            dicts = file.read().split("SEPARATOR\n")
+            exec(f"self._team_obj_by_name = {dicts[0].strip()}")
+            exec(f"self._registrated_users = {dicts[1].strip()}")
+            exec(f"self._registrating_task = {dicts[2].strip()}")
+            exec(f"self._team_by_id = {dicts[3].strip()}")
+            exec(f"self._on_registration = {dicts[4].strip()}")
+
+    def __init__(self, team_by_id_file, contest_id):
         self.contest = Contest(contest_id)
     
         self._registrated_users = {}
@@ -102,19 +120,25 @@ class DataBase:
         self.mutex_reg_task = Mutex()
 
         try: 
-            with open(team_by_id_file, 'r', encoding='utf-8') as file:
-                self._team_by_id = json.loads(file.read())
-
-            with open(team_by_token_file, 'r', encoding='utf-8') as file:
-                self._team_by_token = json.loads(file.read())
+            with open(team_by_id_file, 'r') as file:
+                dct = file.read()
+                exec(f"self._team_by_id = {dct}")
 
             for reg_code, team_name in self._team_by_id.items():
                 self.teams.append(team_name)
+                self._team_by_token[reg_code] = team_name
                 self._team_obj_by_name[team_name] = Team(team_name)
         
         except Exception as e:
             print("Cant read registration file. It should be in print(dict()) form")
             print(e)
+        
+        try:
+            self.load("bot_DB_state.save")
+        except:
+            print("ASDASDASDASDASD")     
+        
+        
 
     def user_choosed_task(self, tg_id : str, task_name : str) -> None:
         self.mutex_reg_task.acquire()
@@ -172,12 +196,12 @@ class DataBase:
         
     def registrate(self, tg_id : str, team_tag : str) -> bool:
         self.mutex_team.acquire()
-        if not (team_tag in self._team_by_token.keys()):
+        if not (team_tag in self._team_by_id.keys()):
             self.mutex_team.release()
             return False
         
         self.mutex_reg_users.acquire()
-        self._registrated_users[tg_id] = self._team_by_token[team_tag]
+        self._registrated_users[tg_id] = self._team_by_id[team_tag]
         self.mutex_team.release()
         self.mutex_reg_users.release()
 
@@ -187,8 +211,8 @@ class DataBase:
         return True
 
     def team_of(self, tg_id : str) -> str:
-        self.mutex_team.acquire()
-        res = self._team_by_id[self._registrated_users[tg_id]]
+        self.mutex_team.acquire();
+        res = self._registrated_users[tg_id];
         self.mutex_team.release()
         return res
 
@@ -215,14 +239,7 @@ class DataBase:
             file.write("SEPARATOR\n")
             file.write(str(self._on_registration)+'\n')
 
-    def load(self, path = "database.save"):
-        with open(path, 'r', encoding='utf-8') as file:
-            dicts = file.read().split("SEPARATOR\n")
-            exec(f"self._team_obj_by_name = {dicts[0]}")
-            exec(f"self._registrated_users = {dicts[1]}")
-            exec(f"self._registrating_task = {dicts[2]}")
-            exec(f"self._team_by_id = {dicts[3]}")
-            exec(f"self._on_registration = {dicts[4]}")
+    
         
     def save_table_to_csv(self, path="table_budget.csv"):
         table = []
@@ -231,7 +248,8 @@ class DataBase:
         for name in self.teams:
             team = self.team_obj_by_name(name)
             table.append([team.name, str(team.budget), str(team.line.solved)] + [str(team.line.tasks[task_name]) for task_name in self.contest.task_names])
-        table.sort(key= lambda a : -int(a[1]))
+        
+        table.sort(key= lambda a : -round(float(a[1])))
         
         with open(path, "w") as file:
             file.write(", ".join(script) + "\n")

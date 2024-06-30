@@ -9,14 +9,17 @@ class Row:
         self.solved = int(solved)
         self.penalty = int(penalty)
         self.tasks = {}
-        for num, score in enumerate(tasks):
-            res = score
-            if (res == '-'):
-                res = '-0'
-            elif (res == "+"):
-                res = '1'
-            self.tasks[task_names[num]] = int(res)
-
+        if (type(tasks) == list):
+            for num, score in enumerate(tasks):
+                res = score
+                if (res == '-'):
+                    res = '-0'
+                elif (res == "+"):
+                    res = '1'
+                self.tasks[task_names[num]] = int(res)
+        else:
+            self.tasks = tasks
+            
     def empty(self):
         return self.team == None  
 

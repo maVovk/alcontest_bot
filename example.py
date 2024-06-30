@@ -65,7 +65,7 @@ except Exception as e:
     print(e, "Проблема при чтении настроек")
 
 logger.info(f'Инициализируем БД c настройками: {settings}')
-db = DataBase(settings["REGISTRATED_TEAMS_FILE"], settings["TEAM_TOKENS_FILE"], settings["CONTEST_ID"])
+db = DataBase(settings["REGISTRATED_TEAMS_FILE"], settings["CONTEST_ID"])
 db.update()
 db.save()
 db.save_table_to_csv()
@@ -477,6 +477,9 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler("start", start)
+  #          CommandHandler("admin-start", )
+   #         CommandHandler("admin-load-db", )
+    #        CommandHandler("admin-end", )    
             ],
         states={
             START_ROUTES: [
@@ -509,6 +512,9 @@ def main() -> None:
 
     # Add ConversationHandler to application that will be used for handling updates
     application.add_handler(conv_handler)
+
+    update_thread = threading.Thread(target=db.parralel_update_sycle)
+    update_thread.start()
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
