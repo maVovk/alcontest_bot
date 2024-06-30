@@ -32,7 +32,7 @@ class Team:
             res = []
             for bet in self.bets:
                 res.append(str(bet))
-            res = "{" + ", ".join(bet) + "}"
+            res = "{" + ", ".join(res) + "}"
 
         return f"Team(\"{self.name}\", {self.budget}, {res}, {str(self.line)})"
 
@@ -120,7 +120,7 @@ class DataBase:
         self.mutex_reg_task = Mutex()
 
         try: 
-            with open(team_by_id_file, 'r') as file:
+            with open(team_by_id_file, 'r', encoding='utf-8') as file:
                 dct = file.read()
                 exec(f"self._team_by_id = {dct}")
 
@@ -173,6 +173,7 @@ class DataBase:
 
     def team_obj_by_name(self, name:str) -> Team:
         self.mutex_team_obj.acquire()
+        print(name)
         res = self._team_obj_by_name[name]
         self.mutex_team_obj.release()
         return res

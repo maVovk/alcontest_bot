@@ -92,7 +92,7 @@ async def registration(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     if db.in_registration_queue(tg_id):
         if db.registrate(tg_id, message):
             reply_text = replies.succesfull_registration.format(db.team_of(tg_id))
-            logger.info(f'{tg_id} зарегалася в тиму {db.team_of(tg_id)}')
+            logger.info(f'{update.message.from_user} зарегалася в тиму {db.team_of(tg_id)}')
 
             keyboard = [
                 [
@@ -135,7 +135,6 @@ async def registration(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     )
 
     return MIDDLE_ROUTES
-
 
 
 async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -211,8 +210,12 @@ async def make_bet(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     task_name = query.data.split('=')[1]
 
     keyboard = [
-        InlineKeyboardButton("Назад", callback_data=str(MENU))
+        [
+            InlineKeyboardButton("Назад", callback_data=str(MENU))
+        ]
     ]
+
+    # print(key)/
 
     db.user_choosed_task(tg_id, task_name)
 
@@ -490,7 +493,7 @@ def main() -> None:
             MIDDLE_ROUTES: [
                 CallbackQueryHandler(menu, pattern="^" + str(MENU) + "$"),
                 CallbackQueryHandler(bet, pattern="^" + str(BET) + "$"),
-                CallbackQueryHandler(make_bet, pattern="task=[A-Z]+$"),
+                CallbackQueryHandler(make_bet, pattern="^task=[a-zA-Z]+$"),
                 CallbackQueryHandler(casino, pattern="^" + str(CASINO) + "$"),
                 CallbackQueryHandler(check, pattern="^" + str(CHECK) + "$"),
                 CallbackQueryHandler(shell, pattern="^" + str(SHELL) + "$"),
